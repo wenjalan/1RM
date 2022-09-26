@@ -1,16 +1,10 @@
-// express server
-import express from 'express';
-import { Request, Response } from 'express';
+import express, { Request, Response } from 'express'
+import apiRouter from './routes/api'
 
-// create express app
 const app = express();
 
-// define a route handler for the default home page
-app.get('/', (req: Request, res: Response) => {
-  res.send('Hello world!');
-});
+app.use('/api', apiRouter)
 
-// start the Express server
 app.listen(3000, () => {
-  console.log('server started at http://localhost:3000');
-});
+  console.log('server started at http://localhost:3000')
+})
