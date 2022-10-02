@@ -1,15 +1,38 @@
 import { Firestore } from '@google-cloud/firestore'
 import * as dotenv from 'dotenv'
+import User from './models/User'
 dotenv.config()
 
-const db = new Firestore({
+const firestore = new Firestore({
   projectId: process.env['FIRESTORE_PROJECT_ID'],
 })
 
-const users = db.collection('users').doc('jdoe')
+const collections = {
+  users: firestore.collection('users')
+}
 
-const f = async () => await users.set({
-  name: 'John Doe',
-  age: 21,
-})
-f()
+async function addUser(user: User) {
+  await collections.users.doc(user.id).set(user)
+}
+
+async function hasUser(userId: string) {
+  const user = await collections.users.doc(userId).get()
+  return user.exists
+}
+
+async function getUser(userId: string): Promise<User> {
+  const user = await collections.users.doc(userId).get()
+  if (!user.exists) Promise.reject(`No such user id ${userId}`)
+  return user.data() as User
+}
+
+async function deleteUser(userId: string) {
+  await collections.users.doc(userId).delete()
+}
+
+export default {
+  addUser,
+  hasUser,
+  getUser,
+  deleteUser
+}

@@ -1,3 +1,4 @@
+import * as dotenv from 'dotenv'
 import express, { Express } from 'express'
 import session from 'express-session'
 import passport from 'passport'
@@ -5,20 +6,27 @@ import GoogleStrategy from 'passport-google-oauth20'
 import apiRouter from './routes/api'
 import authRouter from './routes/auth'
 import clientRouter from './routes/client'
+import database from './db'
+import User from './models/User'
+
+dotenv.config()
 
 export interface ServerConfig {
-  port: number
   sessionSecret: string
   googleAuthClientId: string
   googleAuthClientSecret: string
   googleAuthCallbackUrl: string
 }
 
+const ENV_CONFIG: ServerConfig = {
+  sessionSecret: process.env["SESSION_SECRET"] ? process.env["SESSION_SECRET"] : "",
+  googleAuthClientId: process.env["GOOGLE_AUTH_CLIENT_ID"] ? process.env["GOOGLE_AUTH_CLIENT_ID"] : "",
+  googleAuthClientSecret: process.env["GOOGLE_AUTH_CLIENT_SECRET"] ? process.env["GOOGLE_AUTH_CLIENT_SECRET"] : "",
+  googleAuthCallbackUrl: process.env["GOOGLE_AUTH_CALLBACK_URL"] ? process.env["GOOGLE_AUTH_CALLBACK_URL"] : "",
+}
+
 function init(config: ServerConfig): Express {
   const server = express()
-
-  // settings
-  server.set('json spaces', 2)
 
   // middleware //
   server.use(session({
@@ -27,14 +35,30 @@ function init(config: ServerConfig): Express {
   server.use(passport.authenticate('session'))
 
   // passport //
-  passport.use(new GoogleStrategy.Strategy({
-    clientID: config.googleAuthClientId,
-    clientSecret: config.googleAuthClientSecret,
-    callbackURL: config.googleAuthCallbackUrl,
-    scope: ['profile'],
-  }, (accessToken, refreshToken, profile, done) => {
-    done(null, profile)
-  }))
+  const googleStrategy = new GoogleStrategy.Strategy(
+    {
+      clientID: config.googleAuthClientId,
+      clientSecret: config.googleAuthClientSecret,
+      callbackURL: config.googleAuthCallbackUrl,
+      scope: ['profile'],
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      // TODO: Find a way to extract this user creation process
+      let user: User
+      if (await database.hasUser(profile.id)) {
+        user = await database.getUser(profile.id)
+      }
+      else {
+        user = {
+          id: profile.id,
+          displayName: profile.displayName
+        }
+        await database.addUser(user)
+      }
+      done(null, user)
+    }
+  )
+  passport.use(googleStrategy)
   passport.serializeUser((user, done) => done(null, user))
   passport.deserializeUser((user: Express.User, done) => done(null, user))
 
@@ -45,10 +69,10 @@ function init(config: ServerConfig): Express {
   return server
 }
 
-function serve(config: ServerConfig) {
+function serve(port: number, config: ServerConfig = ENV_CONFIG) {
   const server = init(config)
-  server.listen(config.port, () => {
-    console.log(`server started on port ${config.port}`)
+  server.listen(port, () => {
+    console.log(`server started on port ${port}`)
   })
 }
 
