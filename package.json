@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "build": "npx tsc",
-    "start": "npx nodemon src/Main.ts"
+    "start": "npx nodemon --transpile-only src/index.ts "
   },
   "author": "",
   "license": "ISC",
