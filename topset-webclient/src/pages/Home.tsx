@@ -1,14 +1,5 @@
-import { Card, Divider, Stack } from "@mui/material";
-
-
-interface HomeProps {
-  name: string
-}
-
-const props = {
-  name: 'Alan Wen',
-  bodyweight: '170 lbs'
-}
+import { Card, Divider, Grid, Stack, Typography } from "@mui/material";
+import User from "../model/User";
 
 export default function Home() {
   return (
@@ -24,19 +15,14 @@ export default function Home() {
   )
 }
 
-interface HeaderProps {
-  name: string
-  bodyweight: string
-}
-
 function Header() {
   return (
     <Card sx={{
       padding: '1em'
     }}>
       <Stack>
-        <b>{props.name}</b>
-        <em>{props.bodyweight}</em>
+        <Typography sx={{ fontWeight: 'bold' }}>{"Alan Wen"}</Typography>
+        <Typography>{"170 lbs"}</Typography>
       </Stack>
     </Card>
   )
@@ -49,27 +35,30 @@ function Log() {
     }}>
       <b>Log</b>
       <Stack divider={<Divider />}>
-        <Session weight="225 lbs" date="10/6/22" reps={8} />
-        <Session weight="275 lbs" date="9/29/22" reps={5} />
-        <Session weight="185 lbs" date="9/21/22" reps={10} />
+        <Session />
+        <Session />
+        <Session />
       </Stack>
     </Card>
   )
 }
 
-interface SessionProps {
-  weight: string
-  reps: number
-  date: string
-}
-
-function Session(props: SessionProps) {
+function Session() {
   return (
     <Stack sx={{
       padding: '1em'
     }}>
-      <b>{props.weight} for {props.reps}</b>
-      <em>{props.date}</em>
+      <Grid container direction='row'>
+        <Grid item xs={12}>
+          <Typography sx={{ fontWeight: 'bold' }}>{"225"} for {"8"}</Typography>
+        </Grid>
+        <Grid item xs={6}>
+          <Typography align='left'>{"85% of 1RM"}</Typography>
+        </Grid>
+        <Grid item xs={6}>
+          <Typography align='right'>{"2 days ago"}</Typography>
+        </Grid>
+      </Grid>
     </Stack>
   )
 }
