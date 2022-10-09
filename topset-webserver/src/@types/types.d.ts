@@ -4,7 +4,7 @@ import { Express } from 'express'
 declare module 'express-session' {
   export interface SessionData {
     passport: {
-      user: Express.User
+      user: User
     }
   }
 }
