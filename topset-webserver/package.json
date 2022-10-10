@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "build": "npx tsc",
-    "start": "npx nodemon --transpile-only src/index.ts "
+    "prebuild": "rm -rf ./public && rm -rf ./build && cd ../topset-webclient && npm run build",
+    "build": "cp -R ../topset-webclient/build ./public && npx tsc",
+    "prestart": "npm run build",
+    "start": "npx nodemon --transpile-only src/index.ts"
   },
   "author": "",
   "license": "ISC",
