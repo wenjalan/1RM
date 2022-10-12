@@ -8,3 +8,9 @@ declare module 'express-session' {
     }
   }
 }
+
+declare module 'express' {
+  export interface Request {
+    session: SessionData
+  }
+}

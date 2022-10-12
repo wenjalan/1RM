@@ -1,5 +1,6 @@
 import { Firestore } from '@google-cloud/firestore'
 import * as dotenv from 'dotenv'
+import Session from './models/Session'
 import User from './models/User'
 dotenv.config()
 
@@ -8,7 +9,8 @@ const firestore = new Firestore({
 })
 
 const collections = {
-  users: firestore.collection('users')
+  users: firestore.collection('users'),
+  sessions: firestore.collection('sessions')
 }
 
 async function addUser(user: User) {
@@ -30,9 +32,28 @@ async function deleteUser(userId: string) {
   await collections.users.doc(userId).delete()
 }
 
+async function addSession(session: Session) {
+  await collections.sessions.doc(session.id).set(session)
+}
+
+async function getSession(sessionId: string) {
+  const session = await collections.sessions.doc(sessionId).get()
+  if (!session.exists) Promise.reject(`No such session id ${sessionId}`)
+  return session.data() as Session
+}
+
+async function getSessionLog(userId: string) {
+  if (!hasUser(userId)) Promise.reject(`No such user ${userId}`)
+  const queryResult = await collections.sessions.where("userId", "==", userId).get()
+  return queryResult.docs.map(doc => doc.data()) as Session[]
+}
+
 export default {
   addUser,
   hasUser,
   getUser,
-  deleteUser
+  deleteUser,
+  addSession,
+  getSession,
+  getSessionLog,
 }
