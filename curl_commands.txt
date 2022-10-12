@@ -1,0 +1,6 @@
+curl -X GET http://localhost:3000/api/session -H "Content-Type: application/json" -d '{ "id": "testUser:1665549333209" }' | json_pp
+
+curl -X POST http://localhost:3000/api/session -H "Content-Type: application/json" -d '{ "movement": "testMovement", "weight": 135, "reps": 6, "sets": 3 }' | json_pp
+
+curl -X POST http://localhost:3000/api/user/log
+

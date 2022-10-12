@@ -29,6 +29,7 @@ function init(config: ServerConfig): Express {
   const server = express()
 
   // middleware //
+  server.use(express.json())
   server.use(session({
     secret: config.sessionSecret,
   }))

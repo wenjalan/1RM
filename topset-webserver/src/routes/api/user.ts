@@ -19,7 +19,7 @@ router.get('/', async (req: Request, res: Response) => {
 
 router.get('/log', async (req: Request, res: Response) => {
   const id = req.session.passport.user.id
-  const sessions = db.getSessionLog(id)
+  const sessions = await db.getSessionLog(id)
   res.status(200).json(sessions)
 })
 

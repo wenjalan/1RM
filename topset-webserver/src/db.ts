@@ -38,7 +38,7 @@ async function addSession(session: Session) {
 
 async function getSession(sessionId: string) {
   const session = await collections.sessions.doc(sessionId).get()
-  if (!session.exists) Promise.reject(`No such session id ${sessionId}`)
+  if (!session.exists) return Promise.reject(`No such session id ${sessionId}`)
   return session.data() as Session
 }
 
